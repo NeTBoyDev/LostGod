@@ -107,5 +107,5 @@ Material:
     - _IrisColor: {r: 0, g: 0.80884147, b: 1, a: 1}
     - _OutlineColor: {r: 0, g: 0, b: 0, a: 1}
     - _Position: {r: 0, g: 0, b: 0, a: 0}
-    - _ScleraColor: {r: 1, g: 0.4575472, b: 0.4575472, a: 1}
+    - _ScleraColor: {r: 1, g: 0.33490568, b: 0.33490568, a: 1}
   m_BuildTextureStacks: []
