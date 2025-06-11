@@ -16,16 +16,22 @@ public struct Replique
 public class Dialogue : MonoBehaviour
 {
     [SerializeField] private AudioClip[] _clips;
+    [SerializeField] private AudioClip[] _femaleclips;
+    public bool isFemale;
     [SerializeField] public string CharacterInfo;
     [SerializeField] public List<Replique> History = new();
 
     public TMP_InputField _Input;
     public TMP_Text AnswerText;
+    public TMP_Text CharacterName;
 
     private AudioSource _source;
     private Canvas _canvas;
 
     private Camera Camera;
+
+    private Coroutine WriteCoroutine;
+    private Coroutine AudioCoroutine;
 
     private void Start()
     {
@@ -71,6 +77,7 @@ public class Dialogue : MonoBehaviour
     public void CloseDialogue()
     {
         _canvas.enabled = false;
+        AnswerText.text = string.Empty;
 
         Cursor.visible = _canvas.enabled;
         Cursor.lockState = _canvas.enabled ? CursorLockMode.None : CursorLockMode.Locked;
@@ -87,8 +94,14 @@ public class Dialogue : MonoBehaviour
         History.Add(new Replique(){Sender = "Я",Text = text});
         StartCoroutine(GroqAPI.SendRequest(text, CharacterInfo,History, result =>
         {
-            StartCoroutine(WriteText(result));
-            StartCoroutine(PlaySounds());
+            if (WriteCoroutine != null) 
+                StopCoroutine(WriteCoroutine);
+            if (AudioCoroutine != null) 
+                StopCoroutine(AudioCoroutine);
+            
+            WriteCoroutine = StartCoroutine(WriteText(result));
+            AudioCoroutine = StartCoroutine(PlaySounds());
+            
             History.Add(new Replique(){Sender = "Ты",Text = result});
         }));
     }
@@ -111,7 +124,7 @@ public class Dialogue : MonoBehaviour
     {
         while (isWriting)
         {
-            var clip = _clips[Random.Range(0, _clips.Length)];
+            var clip = isFemale ? _femaleclips[Random.Range(0, _femaleclips.Length)] : _clips[Random.Range(0, _clips.Length)];
             _source.PlayOneShot(clip);
             yield return new WaitForSeconds(clip.length);
         }

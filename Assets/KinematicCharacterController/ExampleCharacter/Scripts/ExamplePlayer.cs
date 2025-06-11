@@ -34,8 +34,7 @@ namespace KinematicCharacterController.Examples
 
         private void Update()
         {
-            if(!MayMove)
-                return;
+            
             if (Input.GetMouseButtonDown(0))
             {
                 Cursor.lockState = CursorLockMode.Locked;
@@ -91,9 +90,9 @@ namespace KinematicCharacterController.Examples
         {
             PlayerCharacterInputs characterInputs = new PlayerCharacterInputs();
 
-            // Build the CharacterInputs struct
-            characterInputs.MoveAxisForward = Input.GetAxisRaw(VerticalInput);
-            characterInputs.MoveAxisRight = Input.GetAxisRaw(HorizontalInput);
+            // Build the CharacterInputs struct 
+            characterInputs.MoveAxisForward = MayMove ? Input.GetAxisRaw(VerticalInput) : 0;
+            characterInputs.MoveAxisRight =  MayMove ? Input.GetAxisRaw(HorizontalInput) : 0;
             characterInputs.CameraRotation = CharacterCamera.Transform.rotation;
             characterInputs.JumpDown = Input.GetKeyDown(KeyCode.Space);
             characterInputs.CrouchDown = Input.GetKeyDown(KeyCode.C);
