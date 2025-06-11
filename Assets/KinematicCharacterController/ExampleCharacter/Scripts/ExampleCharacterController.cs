@@ -171,14 +171,14 @@ namespace KinematicCharacterController.Examples
                         }
 
                         // Jumping input
-                        if (inputs.JumpDown)
+                        /*if (inputs.JumpDown)
                         {
                             _timeSinceJumpRequested = 0f;
                             _jumpRequested = true;
-                        }
+                        }*/
 
                         // Crouching input
-                        if (inputs.CrouchDown)
+                        /*if (inputs.CrouchDown)
                         {
                             _shouldBeCrouching = true;
 
@@ -192,7 +192,7 @@ namespace KinematicCharacterController.Examples
                         else if (inputs.CrouchUp)
                         {
                             _shouldBeCrouching = false;
-                        }
+                        }*/
 
                         break;
                     }

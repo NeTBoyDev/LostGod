@@ -68,7 +68,7 @@ public class GroqAPI : MonoBehaviour
     private static string GetHistoryText(List<Replique> history)
     {
         string historyText = string.Empty;
-        historyText += "Так же вот история нашего с тобой прошлого общения,НЕ УПОМИНАЙ ЕЁ,НО обращайся к ней каждый раз как будешь обдумывать ответ И УЧИТЫВАЙ её при ответе на вопрос, но НЕ используй без необходимости. НЕ ПОВТОРЯЙ УЖЕ СКАЗАННЫЙ ТОБОЙ РЕПЛИКИ. твоя задача ВЕСТИ СО МНОЙ ДИАЛОГ НА ОСНОВЕ ИСТОРИИ НАШИХ СООБЩЕНИЙ. ОТВЕЧАЙ КРАТКО ПО ТЕМЕ БЕЗ ВОДЫ:";
+        //historyText += "Так же вот история нашего с тобой прошлого общения,обращайся к ней каждый раз как будешь обдумывать ответ И УЧИТЫВАЙ её при ответе на вопрос";
         foreach (var replique in history)
         {
             historyText += $" {replique.Sender} : {replique.Text}.";
@@ -82,7 +82,7 @@ public class GroqAPI : MonoBehaviour
             ""messages"": [
                 {{
                     ""role"": ""user"",
-                    ""content"": ""{CharacterInfo.Replace("\"", "\\\"").Replace("$$$",userPrompt.Replace("\"", "\\\"")) + (history.Count > 1 ? GetHistoryText(history) : string.Empty) }""
+                    ""content"": ""{CharacterInfo.Replace("\"", "\\\"").Replace("$$$",userPrompt.Replace("\"", "\\\"")) + (history.Count > 0 ? GetHistoryText(history) : string.Empty) }""
                 }}
             ]
             

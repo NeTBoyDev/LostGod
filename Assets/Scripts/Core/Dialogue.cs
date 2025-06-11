@@ -16,7 +16,7 @@ public struct Replique
 public class Dialogue : MonoBehaviour
 {
     [SerializeField] private AudioClip[] _clips;
-    [SerializeField] private string CharacterInfo;
+    [SerializeField] public string CharacterInfo;
     [SerializeField] public List<Replique> History = new();
 
     public TMP_InputField _Input;
@@ -25,11 +25,13 @@ public class Dialogue : MonoBehaviour
     private AudioSource _source;
     private Canvas _canvas;
 
+    private Camera Camera;
+
     private void Start()
     {
         _source = gameObject.AddComponent<AudioSource>();
         _canvas = GetComponent<Canvas>();
-        
+        Camera = GetComponent<Camera>();
     }
 
 
@@ -37,13 +39,44 @@ public class Dialogue : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Tab))
         {
-            _canvas.enabled = !_canvas.enabled;
-
-            Cursor.visible = _canvas.enabled;
-            Cursor.lockState = _canvas.enabled ? CursorLockMode.None : CursorLockMode.Locked;
-
-            FindObjectOfType<ExamplePlayer>().MayMove = !_canvas.enabled;
+            CloseDialogue();
         }
+
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+        {
+            var ray = new Ray(Camera.main.transform.position,Camera.main.transform.forward);
+            if (Physics.Raycast(ray, out var hit, 2))
+            {
+                if (hit.collider.gameObject.TryGetComponent(out IIenteractable i))
+                {
+                    i.Interact();
+                    OpenDialogue();
+                }
+            }
+            
+        }
+    }
+
+    public void OpenDialogue()
+    {
+        _canvas.enabled = true;
+
+        Cursor.visible = _canvas.enabled;
+        Cursor.lockState = _canvas.enabled ? CursorLockMode.None : CursorLockMode.Locked;
+
+        FindObjectOfType<ExamplePlayer>().MayMove = !_canvas.enabled;
+        
+    }
+
+    public void CloseDialogue()
+    {
+        _canvas.enabled = false;
+
+        Cursor.visible = _canvas.enabled;
+        Cursor.lockState = _canvas.enabled ? CursorLockMode.None : CursorLockMode.Locked;
+
+        FindObjectOfType<ExamplePlayer>().MayMove = !_canvas.enabled;
+        History.Clear();
     }
 
     public void SendText()
@@ -51,11 +84,11 @@ public class Dialogue : MonoBehaviour
         if (!_canvas.enabled)
             return;
         var text = _Input.text;
+        History.Add(new Replique(){Sender = "Я",Text = text});
         StartCoroutine(GroqAPI.SendRequest(text, CharacterInfo,History, result =>
         {
             StartCoroutine(WriteText(result));
             StartCoroutine(PlaySounds());
-            History.Add(new Replique(){Sender = "Я",Text = text});
             History.Add(new Replique(){Sender = "Ты",Text = result});
         }));
     }

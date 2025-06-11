@@ -25,6 +25,7 @@ namespace KinematicCharacterController.Walkthrough.FramePerfectRotation
 
             // Tell camera to follow transform
             OrbitCamera.SetFollowTransform(CameraFollowPoint);
+            OrbitCamera.TargetDistance = 0;
 
             // Ignore the character's collider(s) for camera obstruction checks
             OrbitCamera.IgnoredColliders.Clear();
@@ -70,10 +71,10 @@ namespace KinematicCharacterController.Walkthrough.FramePerfectRotation
             OrbitCamera.UpdateWithInput(Time.deltaTime, scrollInput, lookInputVector);
 
             // Handle toggling zoom level
-            if (Input.GetMouseButtonDown(1))
+            /*if (Input.GetMouseButtonDown(1))
             {
                 OrbitCamera.TargetDistance = (OrbitCamera.TargetDistance == 0f) ? OrbitCamera.DefaultDistance : 0f;
-            }
+            }*/
         }
 
         private void HandleCharacterInput()
