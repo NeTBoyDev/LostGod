@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using KinematicCharacterController.Examples;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
 [System.Serializable]
@@ -21,9 +22,14 @@ public class Dialogue : MonoBehaviour
     [SerializeField] public string CharacterInfo;
     [SerializeField] public List<Replique> History = new();
 
+    [SerializeField] private LayerMask EntityMask;
+    
     public TMP_InputField _Input;
     public TMP_Text AnswerText;
     public TMP_Text CharacterName;
+
+    public Image Crosshair;
+    public Sprite Default, Active;
 
     private AudioSource _source;
     private Canvas _canvas;
@@ -48,19 +54,26 @@ public class Dialogue : MonoBehaviour
             CloseDialogue();
         }
 
-        if (Input.GetKeyDown(KeyCode.Mouse0))
-        {
+        
             var ray = new Ray(Camera.main.transform.position,Camera.main.transform.forward);
-            if (Physics.Raycast(ray, out var hit, 2))
+            if (Physics.Raycast(ray, out var hit, 2.5f,EntityMask))
             {
-                if (hit.collider.gameObject.TryGetComponent(out IIenteractable i))
+                Crosshair.sprite = Active;
+                if (Input.GetKeyDown(KeyCode.Mouse0))
                 {
-                    i.Interact();
-                    OpenDialogue();
+                    if (hit.collider.gameObject.TryGetComponent(out IIenteractable i))
+                    {
+                        i.Interact();
+                        OpenDialogue();
+                    }
                 }
             }
+            else
+            {
+                Crosshair.sprite = Default;
+            }
             
-        }
+        
     }
 
     public void OpenDialogue()
