@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Entity : MonoBehaviour, IIenteractable
+public class Entity : MonoBehaviour, IIenteractable,IInvokable<InvokeType>
 {
     [SerializeField] [TextArea(4, 8)] public string CharacterDescription;
     [SerializeField] private bool isFemale;
@@ -14,5 +14,10 @@ public class Entity : MonoBehaviour, IIenteractable
         dialogue.CharacterInfo = CharacterDescription;
         dialogue.isFemale = isFemale;
         dialogue.CharacterName.text = Name;
+    }
+
+    public void Invoke(InvokeType parameter)
+    {
+        throw new System.NotImplementedException();
     }
 }
