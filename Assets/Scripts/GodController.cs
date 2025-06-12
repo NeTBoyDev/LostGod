@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using KinematicCharacterController.Examples;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class GodController : MonoBehaviour
 {
@@ -14,6 +16,10 @@ public class GodController : MonoBehaviour
 
     private float EyeSizeDefaultValue;
     private float EyeSizeValue;
+    private float EyeOpenValue;
+
+    private AudioSource _source;
+    [SerializeField] private AudioClip _prayClip;
 
     private void Start()
     {
@@ -21,6 +27,12 @@ public class GodController : MonoBehaviour
         Player = FindObjectOfType<ExampleCharacterController>().transform;
         EyeSizeDefaultValue = EyeMaterial.GetFloat("_PupilSize");
         EyeSizeValue = EyeSizeDefaultValue;
+        EyeOpenValue = 0.99f;
+        _source = gameObject.AddComponent<AudioSource>();
+        _source.pitch = 0.5f;
+
+        StartCoroutine(BlinkCycle());
+        StartCoroutine(PrayRequestLoop());
     }
 
     private void Update()
@@ -56,5 +68,43 @@ public class GodController : MonoBehaviour
         }
     }
 
+    private IEnumerator PrayRequestLoop()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(Random.Range(15, 30));
+            _source.PlayOneShot(_prayClip);
+            yield return new WaitForSeconds(_prayClip.length);
+        }
+    }
+
+    private IEnumerator BlinkCycle()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(Random.Range(7, 10));
+            CloseEye();
+            yield return new WaitForSeconds(1);
+            OpenEye();
+        }
+    }
+
+    private void OpenEye()
+    {
+        DOTween.To(() => EyeOpenValue, x =>
+        {
+            EyeOpenValue = x;
+            EyeMaterial.SetFloat("_Open", EyeOpenValue);
+        }, 0.99f, 1);
+    }
+
+    private void CloseEye()
+    {
+        DOTween.To(() => EyeOpenValue, x =>
+        {
+            EyeOpenValue = x;
+            EyeMaterial.SetFloat("_Open", EyeOpenValue);
+        }, 0, 1);
+    }
     
 }

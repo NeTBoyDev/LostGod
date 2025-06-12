@@ -27,6 +27,7 @@ public class Dialogue : MonoBehaviour
     public TMP_InputField _Input;
     public TMP_Text AnswerText;
     public TMP_Text CharacterName;
+    public Entity Character;
 
     public Image Crosshair;
     public Sprite Default, Active;
@@ -111,6 +112,27 @@ public class Dialogue : MonoBehaviour
                 StopCoroutine(WriteCoroutine);
             if (AudioCoroutine != null) 
                 StopCoroutine(AudioCoroutine);
+
+            if (result.Contains("[Event]"))
+            {
+                result.Replace("Event", "");
+                Character.Invoke(InvokeType.Event);
+            }
+            if (result.Contains("[Aggressive]"))
+            {
+                result.Replace("[Aggressive]", "");
+                Character.Invoke(InvokeType.Aggressive);
+            }
+            if (result.Contains("[Stop]"))
+            {
+                result.Replace("[Stop]", "");
+                Character.Invoke(InvokeType.Stop);
+            }
+            if (result.Contains("[Quest]"))
+            {
+                result.Replace("[Quest]", "");
+                Character.Invoke(InvokeType.Quest);
+            }
             
             WriteCoroutine = StartCoroutine(WriteText(result));
             AudioCoroutine = StartCoroutine(PlaySounds());
