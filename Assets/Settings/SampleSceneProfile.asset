@@ -119,6 +119,7 @@ MonoBehaviour:
   - {fileID: 780088928164154520}
   - {fileID: 8276216438737504450}
   - {fileID: -7118231266330065896}
+  - {fileID: 1612930368621128555}
 --- !u!114 &780088928164154520
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -187,6 +188,61 @@ MonoBehaviour:
   maxNits:
     m_OverrideState: 0
     m_Value: 1000
+--- !u!114 &1612930368621128555
+MonoBehaviour:
+  m_ObjectHideFlags: 3
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a7913ff8e4ad9d479ef7e06b8b0eea3, type: 3}
+  m_Name: EyeOpeningEffectVolume
+  m_EditorClassIdentifier: 
+  active: 1
+  _EyeOpenness:
+    m_OverrideState: 1
+    m_Value: 1
+  _EyeWidth:
+    m_OverrideState: 1
+    m_Value: 1.45
+  _ScreenColor:
+    m_OverrideState: 1
+    m_Value: {r: 0, g: 0, b: 0, a: 1}
+  _ScatteringTransitionScreenColor:
+    m_OverrideState: 1
+    m_Value: {r: 0.094, g: 0.0156, b: 0.0156, a: 1}
+  _ScatteringTransitionThreshold:
+    m_OverrideState: 1
+    m_Value: 0.15
+  _ScatteringTransitionSmoothness:
+    m_OverrideState: 1
+    m_Value: 0.42
+  _ScatteringColor:
+    m_OverrideState: 1
+    m_Value: {r: 0.8, g: 0.4, b: 0.3, a: 1}
+  _ScatteringIntensity:
+    m_OverrideState: 1
+    m_Value: 0.011
+  _ScatteringWidth:
+    m_OverrideState: 1
+    m_Value: 0.15
+  _ScatteringOffset:
+    m_OverrideState: 1
+    m_Value: 1
+  _BlurIntensity:
+    m_OverrideState: 1
+    m_Value: 2
+  _BlurQuality:
+    m_OverrideState: 1
+    m_Value: 1
+  _FadeOutTransitionThreshold:
+    m_OverrideState: 1
+    m_Value: 0.9
+  _FadeOutTransitionSmoothness:
+    m_OverrideState: 1
+    m_Value: 0.1
 --- !u!114 &8276216438737504450
 MonoBehaviour:
   m_ObjectHideFlags: 3

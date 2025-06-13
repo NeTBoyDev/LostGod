@@ -1,9 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using KinematicCharacterController.Examples;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
@@ -33,18 +35,24 @@ public class Dialogue : MonoBehaviour
     public Sprite Default, Active;
 
     private AudioSource _source;
-    private Canvas _canvas;
+    private CanvasGroup _canvas;
 
     private Camera Camera;
 
     private Coroutine WriteCoroutine;
     private Coroutine AudioCoroutine;
 
+    private bool isDialogueOpen;
+
     private void Start()
     {
         _source = gameObject.AddComponent<AudioSource>();
-        _canvas = GetComponent<Canvas>();
+        _canvas = GetComponentInChildren<CanvasGroup>();
         Camera = GetComponent<Camera>();
+
+
+        var volume = FindObjectOfType<Volume>();
+        AnimateEyeOpening(volume.profile, 1);
     }
 
 
@@ -60,7 +68,7 @@ public class Dialogue : MonoBehaviour
             if (Physics.Raycast(ray, out var hit, 2.5f,EntityMask))
             {
                 Crosshair.sprite = Active;
-                if (Input.GetKeyDown(KeyCode.Mouse0))
+                if (Input.GetKeyDown(KeyCode.Mouse0) && !isDialogueOpen)
                 {
                     if (hit.collider.gameObject.TryGetComponent(out IIenteractable i))
                     {
@@ -79,25 +87,31 @@ public class Dialogue : MonoBehaviour
 
     public void OpenDialogue()
     {
-        _canvas.enabled = true;
+        isDialogueOpen = true;
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
 
-        Cursor.visible = _canvas.enabled;
-        Cursor.lockState = _canvas.enabled ? CursorLockMode.None : CursorLockMode.Locked;
+        FindObjectOfType<ExamplePlayer>().MayMove = false;
+        DOTween.To(() => _canvas.alpha, x => _canvas.alpha = x, 1, .25f);
 
-        FindObjectOfType<ExamplePlayer>().MayMove = !_canvas.enabled;
-        
+        if (Character != null && !string.IsNullOrWhiteSpace(Character.StartText))
+        {
+            SendText(Character.StartText);
+        }
     }
 
     public void CloseDialogue()
     {
-        _canvas.enabled = false;
+        isDialogueOpen = false;
+        Character = null;
         AnswerText.text = string.Empty;
 
-        Cursor.visible = _canvas.enabled;
-        Cursor.lockState = _canvas.enabled ? CursorLockMode.None : CursorLockMode.Locked;
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
 
-        FindObjectOfType<ExamplePlayer>().MayMove = !_canvas.enabled;
+        FindObjectOfType<ExamplePlayer>().MayMove = true;
         History.Clear();
+        DOTween.To(() => _canvas.alpha, x => _canvas.alpha = x, 0, .25f);
     }
 
     public void SendText()
@@ -105,6 +119,46 @@ public class Dialogue : MonoBehaviour
         if (!_canvas.enabled)
             return;
         var text = _Input.text;
+        History.Add(new Replique(){Sender = "Я",Text = text});
+        StartCoroutine(GroqAPI.SendRequest(text, CharacterInfo,History, result =>
+        {
+            if (WriteCoroutine != null) 
+                StopCoroutine(WriteCoroutine);
+            if (AudioCoroutine != null) 
+                StopCoroutine(AudioCoroutine);
+
+            if (result.Contains("[Event]"))
+            {
+                result = result.Replace("Event", "");
+                Character.Invoke(InvokeType.Event);
+            }
+            if (result.Contains("[Aggressive]"))
+            {
+                result = result.Replace("[Aggressive]", "");
+                Character.Invoke(InvokeType.Aggressive);
+            }
+            if (result.Contains("[Stop]"))
+            {
+                result = result.Replace("[Stop]", "");
+                Character.Invoke(InvokeType.Stop);
+            }
+            if (result.Contains("[Quest]"))
+            {
+                result = result.Replace("[Quest]", "");
+                Character.Invoke(InvokeType.Quest);
+            }
+            
+            WriteCoroutine = StartCoroutine(WriteText(result));
+            AudioCoroutine = StartCoroutine(PlaySounds());
+            
+            History.Add(new Replique(){Sender = "Ты",Text = result});
+        }));
+    }
+    
+    public void SendText(string text)
+    {
+        if (!_canvas.enabled)
+            return;
         History.Add(new Replique(){Sender = "Я",Text = text});
         StartCoroutine(GroqAPI.SendRequest(text, CharacterInfo,History, result =>
         {
@@ -162,6 +216,27 @@ public class Dialogue : MonoBehaviour
             var clip = isFemale ? _femaleclips[Random.Range(0, _femaleclips.Length)] : _clips[Random.Range(0, _clips.Length)];
             _source.PlayOneShot(clip);
             yield return new WaitForSeconds(clip.length);
+        }
+    }
+    public void AnimateEyeOpening(VolumeProfile postProcessingProfile, float duration = 1f)
+    {
+        // Находим компонент EyeOpeningEffect в профиле постобработки
+        if (postProcessingProfile.TryGet<EyeOpeningEffectVolume>(out var eyeEffect))
+        {
+            // Устанавливаем начальное значение EyeOpenness
+            eyeEffect._EyeOpenness.value = 0f;
+            
+            // Создаем анимацию с помощью DOTween
+            DOTween.To(
+                () => eyeEffect._EyeOpenness.value,           // Геттер
+                x => eyeEffect._EyeOpenness.value = x,       // Сеттер
+                1f,                                         // Конечное значение
+                duration                                    // Длительность анимации
+            ).SetEase(Ease.InOutSine);                      // Тип смягчения анимации
+        }
+        else
+        {
+            Debug.LogWarning("EyeOpeningEffect не найден в профиле постобработки!");
         }
     }
 }

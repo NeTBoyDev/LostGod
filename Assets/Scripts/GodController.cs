@@ -17,9 +17,12 @@ public class GodController : MonoBehaviour
     private float EyeSizeDefaultValue;
     private float EyeSizeValue;
     private float EyeOpenValue;
+    private bool EyeOpened;
+
+    [SerializeField] private Material GlitchScreenMaterial;
 
     private AudioSource _source;
-    [SerializeField] private AudioClip _prayClip;
+    [SerializeField] private AudioClip[] _prayClip;
 
     private void Start()
     {
@@ -31,7 +34,7 @@ public class GodController : MonoBehaviour
         _source = gameObject.AddComponent<AudioSource>();
         _source.pitch = 0.5f;
 
-        StartCoroutine(BlinkCycle());
+        //StartCoroutine(BlinkCycle());
         StartCoroutine(PrayRequestLoop());
     }
 
@@ -73,8 +76,25 @@ public class GodController : MonoBehaviour
         while (true)
         {
             yield return new WaitForSeconds(Random.Range(15, 30));
-            _source.PlayOneShot(_prayClip);
-            yield return new WaitForSeconds(_prayClip.length);
+            GlitchScreenMaterial.DOFloat(60, "_NoiseAmount", 1f).SetEase(Ease.Linear);
+            // Анимация _GlitchStrength
+            GlitchScreenMaterial.DOFloat(2, "_GlitchStrength", 1f).SetEase(Ease.Linear);
+            OpenEye();
+            var clip = _prayClip[Random.Range(0, _prayClip.Length)];
+            _source.PlayOneShot(clip);
+
+            var entitys = FindObjectsOfType<Entity>();
+            foreach (var entity in entitys)
+            {
+                entity.Pray(); 
+            }
+            
+            yield return new WaitForSeconds(clip.length);
+            
+            GlitchScreenMaterial.DOFloat(0, "_NoiseAmount", 1f).SetEase(Ease.Linear);
+            // Анимация _GlitchStrength
+            GlitchScreenMaterial.DOFloat(0, "_GlitchStrength", 1f).SetEase(Ease.Linear);
+            CloseEye();
         }
     }
 
@@ -91,20 +111,27 @@ public class GodController : MonoBehaviour
 
     private void OpenEye()
     {
+        EyeOpened = true;
         DOTween.To(() => EyeOpenValue, x =>
         {
             EyeOpenValue = x;
             EyeMaterial.SetFloat("_Open", EyeOpenValue);
-        }, 0.99f, 1);
+        }, 0.99f, 2);
     }
 
     private void CloseEye()
     {
+        EyeOpened = false;
         DOTween.To(() => EyeOpenValue, x =>
         {
             EyeOpenValue = x;
             EyeMaterial.SetFloat("_Open", EyeOpenValue);
-        }, 0, 1);
+        }, 0, 2);
     }
-    
+
+    private void OnDestroy()
+    {
+        GlitchScreenMaterial.SetFloat("_NoiseAmount",0);
+        GlitchScreenMaterial.SetFloat("_GlitchStrength",0);
+    }
 }
