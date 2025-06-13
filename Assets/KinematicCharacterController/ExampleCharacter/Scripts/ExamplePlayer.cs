@@ -35,10 +35,10 @@ namespace KinematicCharacterController.Examples
         private void Update()
         {
             
-            if (Input.GetMouseButtonDown(0))
+            /*if (Input.GetMouseButtonDown(0))
             {
                 Cursor.lockState = CursorLockMode.Locked;
-            }
+            }*/
 
             HandleCharacterInput();
         }
@@ -71,7 +71,7 @@ namespace KinematicCharacterController.Examples
             }
 
             // Input for zooming the camera (disabled in WebGL because it can cause problems)
-            float scrollInput = -Input.GetAxis(MouseScrollInput);
+            float scrollInput = 0;
 #if UNITY_WEBGL
         scrollInput = 0f;
 #endif
