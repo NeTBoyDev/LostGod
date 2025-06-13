@@ -22,7 +22,9 @@ public class GodController : MonoBehaviour
     [SerializeField] private Material GlitchScreenMaterial;
 
     private AudioSource _source;
+    private AudioSource _musicsource;
     [SerializeField] private AudioClip[] _prayClip;
+    [SerializeField] private AudioClip _prayMusic;
 
     private void Start()
     {
@@ -32,7 +34,8 @@ public class GodController : MonoBehaviour
         EyeSizeValue = EyeSizeDefaultValue;
         EyeOpenValue = 0.99f;
         _source = gameObject.AddComponent<AudioSource>();
-        _source.pitch = 0.5f;
+        _musicsource = gameObject.AddComponent<AudioSource>();
+        _source.pitch = 0.7f;
 
         //StartCoroutine(BlinkCycle());
         StartCoroutine(PrayRequestLoop());
@@ -75,13 +78,12 @@ public class GodController : MonoBehaviour
     {
         while (true)
         {
-            yield return new WaitForSeconds(Random.Range(15, 30));
-            GlitchScreenMaterial.DOFloat(60, "_NoiseAmount", 1f).SetEase(Ease.Linear);
+            yield return new WaitForSeconds(Random.Range(45, 60));
+            GlitchScreenMaterial.DOFloat(60, "_NoiseAmount", 5f).SetEase(Ease.Linear);
             // Анимация _GlitchStrength
-            GlitchScreenMaterial.DOFloat(2, "_GlitchStrength", 1f).SetEase(Ease.Linear);
+            GlitchScreenMaterial.DOFloat(2, "_GlitchStrength", 5f).SetEase(Ease.Linear);
             OpenEye();
-            var clip = _prayClip[Random.Range(0, _prayClip.Length)];
-            _source.PlayOneShot(clip);
+           
 
             var entitys = FindObjectsOfType<Entity>();
             foreach (var entity in entitys)
@@ -89,11 +91,16 @@ public class GodController : MonoBehaviour
                 entity.Pray(); 
             }
             
+            _musicsource.PlayOneShot(_prayMusic);
+            yield return new WaitForSeconds(_prayMusic.length / 3);
+            
+            var clip = _prayClip[Random.Range(0, _prayClip.Length)];
+            _source.PlayOneShot(clip);
             yield return new WaitForSeconds(clip.length);
             
-            GlitchScreenMaterial.DOFloat(0, "_NoiseAmount", 1f).SetEase(Ease.Linear);
+            GlitchScreenMaterial.DOFloat(0, "_NoiseAmount", 5f).SetEase(Ease.Linear);
             // Анимация _GlitchStrength
-            GlitchScreenMaterial.DOFloat(0, "_GlitchStrength", 1f).SetEase(Ease.Linear);
+            GlitchScreenMaterial.DOFloat(0, "_GlitchStrength", 5f).SetEase(Ease.Linear);
             CloseEye();
         }
     }

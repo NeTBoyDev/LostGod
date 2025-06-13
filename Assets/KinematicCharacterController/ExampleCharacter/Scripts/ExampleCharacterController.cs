@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using KinematicCharacterController;
 using System;
+using Random = UnityEngine.Random;
 
 namespace KinematicCharacterController.Examples
 {
@@ -89,6 +90,9 @@ namespace KinematicCharacterController.Examples
         private Vector3 lastInnerNormal = Vector3.zero;
         private Vector3 lastOuterNormal = Vector3.zero;
 
+        [SerializeField] private AudioClip[] _stepClips;
+        private AudioSource _stepSource;
+
         private void Awake()
         {
             // Handle initial state
@@ -96,6 +100,16 @@ namespace KinematicCharacterController.Examples
 
             // Assign the characterController to the motor
             Motor.CharacterController = this;
+
+            _stepSource = gameObject.GetComponent<AudioSource>();
+        }
+
+        [SerializeField] private float stepDelay;
+        private float stepCounter;
+
+        private void Update()
+        {
+            
         }
 
         /// <summary>
@@ -152,6 +166,17 @@ namespace KinematicCharacterController.Examples
                 cameraPlanarDirection = Vector3.ProjectOnPlane(inputs.CameraRotation * Vector3.up, Motor.CharacterUp).normalized;
             }
             Quaternion cameraPlanarRotation = Quaternion.LookRotation(cameraPlanarDirection, Motor.CharacterUp);
+            
+            if (stepCounter <= 0 && moveInputVector.normalized.magnitude > .2f)
+            {
+                stepCounter = stepDelay;
+                _stepSource.pitch = Random.Range(0.8f, 0.9f);
+                _stepSource.PlayOneShot(_stepClips[Random.Range(0,_stepClips.Length)]);
+            }
+            else
+            {
+                stepCounter -= Time.deltaTime;
+            }
 
             switch (CurrentCharacterState)
             {
