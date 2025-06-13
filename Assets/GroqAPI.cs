@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 
 public class GroqAPI : MonoBehaviour
 {
-    private static string apiKey = "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";
+    private static string apiKey = "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";
     [SerializeField] [TextArea(3, 10)] private string userPrompt = "Enter your prompt here";
     [SerializeField] [TextArea(3, 10)] private string CharacterInfo = "Enter your prompt here";
     
